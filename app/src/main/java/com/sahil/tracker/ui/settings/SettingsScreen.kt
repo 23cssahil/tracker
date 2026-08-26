@@ -183,22 +183,13 @@ fun SettingsScreen() {
                             onClick = {
                                 android.widget.Toast.makeText(context, "App hidden! Please manually remove the dead shortcut from your home screen.", android.widget.Toast.LENGTH_LONG).show()
                                 
-                                // Go to home screen smoothly
-                                val homeIntent = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
-                                    addCategory(android.content.Intent.CATEGORY_HOME)
-                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-                                }
-                                context.startActivity(homeIntent)
-
-                                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                    val pm = context.packageManager
-                                    val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
-                                    pm.setComponentEnabledSetting(
-                                        comp,
-                                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                                        0 // Pass 0 to allow the system to kill the app and forcefully refresh the launcher
-                                    )
-                                }, 1000)
+                                val pm = context.packageManager
+                                val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
+                                pm.setComponentEnabledSetting(
+                                    comp,
+                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                    0
+                                )
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
