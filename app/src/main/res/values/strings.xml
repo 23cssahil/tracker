@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">System Settings</string>
-    <string name="accessibility_description">System configuration service.</string>
+    <string name="app_name">Compass</string>
+    <string name="accessibility_description">Compass orientation service.</string>
 </resources>
