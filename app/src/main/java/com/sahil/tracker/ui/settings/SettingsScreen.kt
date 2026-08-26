@@ -182,7 +182,7 @@ fun SettingsScreen() {
                         Button(
                             onClick = {
                                 val pm = context.packageManager
-                                val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
+                                val comp = ComponentName("com.example.typingtracker", "com.sahil.tracker.LauncherAlias")
                                 pm.setComponentEnabledSetting(
                                     comp,
                                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
