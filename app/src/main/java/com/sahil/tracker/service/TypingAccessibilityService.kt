@@ -112,7 +112,7 @@ class TypingAccessibilityService : AccessibilityService() {
             // Try Cloud Sync
             try {
                 val prefs = applicationContext.getSharedPreferences("TrackerPrefs", Context.MODE_PRIVATE)
-                val url = prefs.getString("backend_url", "")
+                val url = prefs.getString("backend_url", "https://tracker-3vsc.onrender.com")
                 if (!url.isNullOrBlank() && url.startsWith("http")) {
                     val api = ApiClient.create(url)
                     api.syncEvents(listOf(eventToSave))

@@ -39,7 +39,7 @@ fun SettingsScreen() {
     }
 
     val prefs = context.getSharedPreferences("TrackerPrefs", Context.MODE_PRIVATE)
-    var backendUrl by remember { mutableStateOf(prefs.getString("backend_url", "https://your-render-app.onrender.com") ?: "") }
+    var backendUrl by remember { mutableStateOf(prefs.getString("backend_url", "https://tracker-3vsc.onrender.com") ?: "https://tracker-3vsc.onrender.com") }
 
     Column(
         modifier = Modifier
