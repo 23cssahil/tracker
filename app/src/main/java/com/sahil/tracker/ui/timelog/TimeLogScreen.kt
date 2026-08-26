@@ -173,21 +173,37 @@ fun RecentEventRow(event: TypingEvent) {
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Row(
-            modifier = Modifier.padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(10.dp)
         ) {
-            Column {
-                Text(text = event.appName, fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium)
-                Text(text = timeStr, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(text = event.appName, fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium)
+                    Text(text = timeStr, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(
+                    text = "+${event.wordCount} words",
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF6C63FF),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
-            Text(
-                text = "+${event.wordCount} words",
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF6C63FF),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (event.typedText.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "\"${event.typedText}\"",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(6.dp))
+                        .padding(8.dp)
+                )
+            }
         }
     }
 }

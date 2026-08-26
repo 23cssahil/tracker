@@ -12,5 +12,6 @@ data class TypingEvent(
     val charCount: Int,
     val timestamp: Long,
     val hour: Int,
-    val dateString: String
+    val dateString: String,
+    val typedText: String = ""
 )

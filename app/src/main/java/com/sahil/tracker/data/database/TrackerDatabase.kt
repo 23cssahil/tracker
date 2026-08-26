@@ -9,7 +9,7 @@ import com.sahil.tracker.data.models.TypingEvent
 
 @Database(
     entities = [TypingEvent::class, Note::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class TrackerDatabase : RoomDatabase() {
@@ -27,7 +27,8 @@ abstract class TrackerDatabase : RoomDatabase() {
                     context.applicationContext,
                     TrackerDatabase::class.java,
                     "tracker_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                 .build()
                 INSTANCE = instance
                 instance
             }

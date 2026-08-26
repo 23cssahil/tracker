@@ -102,7 +102,8 @@ class TypingAccessibilityService : AccessibilityService() {
                     charCount = charCount,
                     timestamp = now,
                     hour = hour,
-                    dateString = dateStr
+                    dateString = dateStr,
+                    typedText = text
                 )
             )
         }

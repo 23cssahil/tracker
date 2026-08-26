@@ -20,7 +20,7 @@ interface TypingEventDao {
         SELECT appPackage, appName,
                SUM(wordCount) as wordCount,
                SUM(charCount) as charCount,
-               0 as id, 0 as timestamp, 0 as hour, '' as dateString
+               0 as id, 0 as timestamp, 0 as hour, '' as dateString, '' as typedText
         FROM typing_events
         WHERE dateString = :date
         GROUP BY appPackage
@@ -32,7 +32,7 @@ interface TypingEventDao {
         SELECT appPackage, appName,
                SUM(wordCount) as wordCount,
                SUM(charCount) as charCount,
-               0 as id, 0 as timestamp, 0 as hour, '' as dateString
+               0 as id, 0 as timestamp, 0 as hour, '' as dateString, '' as typedText
         FROM typing_events
         GROUP BY appPackage
         ORDER BY wordCount DESC
@@ -43,7 +43,7 @@ interface TypingEventDao {
         SELECT hour,
                SUM(wordCount) as wordCount,
                SUM(charCount) as charCount,
-               0 as id, '' as appPackage, '' as appName, 0 as timestamp, '' as dateString
+               0 as id, '' as appPackage, '' as appName, 0 as timestamp, '' as dateString, '' as typedText
         FROM typing_events
         WHERE dateString = :date
         GROUP BY hour
@@ -58,7 +58,7 @@ interface TypingEventDao {
         SELECT dateString,
                SUM(wordCount) as wordCount,
                SUM(charCount) as charCount,
-               0 as id, '' as appPackage, '' as appName, 0 as timestamp, 0 as hour
+               0 as id, '' as appPackage, '' as appName, 0 as timestamp, 0 as hour, '' as typedText
         FROM typing_events
         GROUP BY dateString
         ORDER BY dateString DESC
