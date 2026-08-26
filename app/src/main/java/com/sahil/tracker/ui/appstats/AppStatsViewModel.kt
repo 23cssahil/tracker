@@ -24,6 +24,9 @@ class AppStatsViewModel(app: Application) : AndroidViewModel(app) {
     private val _isAllTime = MutableStateFlow(false)
     val isAllTime: StateFlow<Boolean> = _isAllTime.asStateFlow()
 
+    private val _selectedAppEvents = MutableStateFlow<List<TypingEvent>>(emptyList())
+    val selectedAppEvents: StateFlow<List<TypingEvent>> = _selectedAppEvents.asStateFlow()
+
     val todayDate: String = dateFormat.format(Date())
 
     init {
@@ -48,5 +51,17 @@ class AppStatsViewModel(app: Application) : AndroidViewModel(app) {
                 _appStats.value = it
             }
         }
+    }
+
+    fun loadAppEvents(pkg: String) {
+        viewModelScope.launch {
+            repository.getEventsForApp(pkg).collect {
+                _selectedAppEvents.value = it
+            }
+        }
+    }
+
+    fun clearSelectedApp() {
+        _selectedAppEvents.value = emptyList()
     }
 }

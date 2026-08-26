@@ -54,6 +54,9 @@ interface TypingEventDao {
     @Query("SELECT * FROM typing_events WHERE dateString = :date ORDER BY timestamp DESC LIMIT 200")
     fun getRecentEvents(date: String): Flow<List<TypingEvent>>
 
+    @Query("SELECT * FROM typing_events WHERE appPackage = :pkg ORDER BY timestamp DESC LIMIT 100")
+    fun getEventsForApp(pkg: String): Flow<List<TypingEvent>>
+
     @Query("""
         SELECT dateString,
                SUM(wordCount) as wordCount,

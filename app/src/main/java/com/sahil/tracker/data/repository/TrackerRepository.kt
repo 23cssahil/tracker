@@ -19,6 +19,7 @@ class TrackerRepository(
     fun getAllTimeAppSummary(): Flow<List<TypingEvent>> = typingEventDao.getAllTimeAppSummary()
     fun getHourlyActivity(date: String): Flow<List<TypingEvent>> = typingEventDao.getHourlyActivity(date)
     fun getRecentEvents(date: String): Flow<List<TypingEvent>> = typingEventDao.getRecentEvents(date)
+    fun getEventsForApp(pkg: String): Flow<List<TypingEvent>> = typingEventDao.getEventsForApp(pkg)
     fun getDailyHistory(): Flow<List<TypingEvent>> = typingEventDao.getDailyHistory()
     suspend fun deleteOldEvents(cutoffMillis: Long) = typingEventDao.deleteOldEvents(cutoffMillis)
 

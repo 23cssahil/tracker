@@ -3,8 +3,10 @@ package com.sahil.tracker.ui.appstats
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sahil.tracker.data.models.TypingEvent
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 val appColors = listOf(
     Color(0xFF6C63FF), Color(0xFF00BFA5), Color(0xFFFF6D00),
@@ -25,11 +30,16 @@ val appColors = listOf(
     Color(0xFFFF5722), Color(0xFF9C27B0), Color(0xFF03A9F4)
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppStatsScreen(vm: AppStatsViewModel = viewModel()) {
     val stats by vm.appStats.collectAsState()
     val isAllTime by vm.isAllTime.collectAsState()
+    val selectedAppEvents by vm.selectedAppEvents.collectAsState()
     val totalWords = stats.sumOf { it.wordCount }.coerceAtLeast(1)
+
+    var selectedApp by remember { mutableStateOf<TypingEvent?>(null) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     LazyColumn(
         modifier = Modifier
@@ -85,8 +95,44 @@ fun AppStatsScreen(vm: AppStatsViewModel = viewModel()) {
                     app = app,
                     totalWords = totalWords,
                     color = appColors[index % appColors.size],
-                    rank = index + 1
+                    rank = index + 1,
+                    onClick = {
+                        selectedApp = app
+                        vm.loadAppEvents(app.appPackage)
+                    }
                 )
+            }
+        }
+    }
+
+    if (selectedApp != null) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                selectedApp = null
+                vm.clearSelectedApp()
+            },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+                Text(
+                    text = "${selectedApp?.appName} Activity",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                if (selectedAppEvents.isEmpty()) {
+                    Text("Loading or no details available...")
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(selectedAppEvents) { event ->
+                            AppRecentEventRow(event = event)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -120,12 +166,14 @@ fun AppDonutLegend(stats: List<TypingEvent>, totalWords: Int) {
 }
 
 @Composable
-fun AppStatRow(app: TypingEvent, totalWords: Int, color: Color, rank: Int) {
+fun AppStatRow(app: TypingEvent, totalWords: Int, color: Color, rank: Int, onClick: () -> Unit) {
     val fraction = app.wordCount.toFloat() / totalWords
     val animFraction by animateFloatAsState(targetValue = fraction, animationSpec = tween(800), label = "bar$rank")
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -161,6 +209,47 @@ fun AppStatRow(app: TypingEvent, totalWords: Int, color: Color, rank: Int) {
             Column(horizontalAlignment = Alignment.End) {
                 Text(text = "${app.wordCount}", fontWeight = FontWeight.Bold, color = color)
                 Text(text = "words", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+    }
+}
+
+@Composable
+fun AppRecentEventRow(event: TypingEvent) {
+    val dateStr = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault()).format(Date(event.timestamp))
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = dateStr, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = "+${event.wordCount} words",
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF6C63FF),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            if (event.typedText.isNotBlank()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "\"${event.typedText}\"",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(6.dp))
+                        .padding(8.dp)
+                )
             }
         }
     }
