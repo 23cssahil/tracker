@@ -1,9 +1,13 @@
 package com.sahil.tracker.ui.settings
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -34,6 +38,9 @@ fun SettingsScreen() {
         )
     }
 
+    val prefs = context.getSharedPreferences("TrackerPrefs", Context.MODE_PRIVATE)
+    var backendUrl by remember { mutableStateOf(prefs.getString("backend_url", "https://your-render-app.onrender.com") ?: "") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,15 +48,22 @@ fun SettingsScreen() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Settings",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Text(
+                    text = "Settings",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
-        // Service status card
-        Card(
+            item {
+                // Service status card
+                Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
@@ -91,43 +105,101 @@ fun SettingsScreen() {
                     colors = SwitchDefaults.colors(checkedThumbColor = Color(0xFF6C63FF))
                 )
             }
-        }
-
-        // Info card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("How it works", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
-                InfoRow(emoji = "🔒", text = "All data stays on your phone — 100% private")
-                InfoRow(emoji = "📊", text = "Counts words as you type in any app")
-                InfoRow(emoji = "🔋", text = "Minimal battery impact (lightweight service)")
-                InfoRow(emoji = "⚡", text = "Requires Accessibility permission to detect keystrokes")
             }
         }
 
-        // How to enable
-        if (!isServiceEnabled) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF6C63FF).copy(alpha = 0.08f))
-            ) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Enable Steps", fontWeight = FontWeight.SemiBold, color = Color(0xFF6C63FF))
-                    Text("1. Tap the switch above", style = MaterialTheme.typography.bodySmall)
-                    Text("2. Find 'Typing Tracker' in Accessibility", style = MaterialTheme.typography.bodySmall)
-                    Text("3. Toggle it ON", style = MaterialTheme.typography.bodySmall)
-                    Text("4. Come back to the app", style = MaterialTheme.typography.bodySmall)
+
+
+            // Info card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("How it works", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                        InfoRow(emoji = "🔒", text = "All data stays on your phone — 100% private")
+                        InfoRow(emoji = "📊", text = "Counts words as you type in any app")
+                        InfoRow(emoji = "🔋", text = "Minimal battery impact (lightweight service)")
+                        InfoRow(emoji = "⚡", text = "Requires Accessibility permission to detect keystrokes")
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            // How to enable
+            item {
+                if (!isServiceEnabled) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF6C63FF).copy(alpha = 0.08f))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Enable Steps", fontWeight = FontWeight.SemiBold, color = Color(0xFF6C63FF))
+                            Text("1. Tap the switch above", style = MaterialTheme.typography.bodySmall)
+                            Text("2. Find 'Typing Tracker' in Accessibility", style = MaterialTheme.typography.bodySmall)
+                            Text("3. Toggle it ON", style = MaterialTheme.typography.bodySmall)
+                            Text("4. Come back to the app", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+
+            // Sync Settings
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Cloud Sync (MongoDB)", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                        OutlinedTextField(
+                            value = backendUrl,
+                            onValueChange = {
+                                backendUrl = it
+                                prefs.edit().putString("backend_url", it).apply()
+                            },
+                            label = { Text("Render Backend URL") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                    }
+                }
+            }
+
+            // Stealth Mode
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("Stealth Mode", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                        Text("Hides the app icon from your phone. To open the app again, dial *#*#1234#*#* from your Phone app.", style = MaterialTheme.typography.bodySmall)
+                        Button(
+                            onClick = {
+                                val pm = context.packageManager
+                                val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
+                                pm.setComponentEnabledSetting(
+                                    comp,
+                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                    PackageManager.DONT_KILL_APP
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text("Hide App Icon Now")
+                        }
+                    }
+                }
+            }
+        } // End LazyColumn
+
         Text(
-            text = "Typing Tracker v1.0 • Personal Use Only",
+            text = "Typing Tracker v1.1 • Stealth Edition",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally)

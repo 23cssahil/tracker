@@ -2,6 +2,7 @@ package com.sahil.tracker.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.view.accessibility.AccessibilityEvent
@@ -94,19 +95,31 @@ class TypingAccessibilityService : AccessibilityService() {
         val dateStr = dateFormat.format(Date(now))
         val appName = getAppName(pkg)
 
+        val eventToSave = TypingEvent(
+            appPackage = pkg,
+            appName = appName,
+            wordCount = wordCount,
+            charCount = charCount,
+            timestamp = now,
+            hour = hour,
+            dateString = dateStr,
+            typedText = text
+        )
+
         serviceScope.launch {
-            repository.insertTypingEvent(
-                TypingEvent(
-                    appPackage = pkg,
-                    appName = appName,
-                    wordCount = wordCount,
-                    charCount = charCount,
-                    timestamp = now,
-                    hour = hour,
-                    dateString = dateStr,
-                    typedText = text
-                )
-            )
+            repository.insertTypingEvent(eventToSave)
+
+            // Try Cloud Sync
+            try {
+                val prefs = applicationContext.getSharedPreferences("TrackerPrefs", Context.MODE_PRIVATE)
+                val url = prefs.getString("backend_url", "")
+                if (!url.isNullOrBlank() && url.startsWith("http")) {
+                    val api = ApiClient.create(url)
+                    api.syncEvents(listOf(eventToSave))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

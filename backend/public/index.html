@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Tracker Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Typing Tracker Dashboard</h1>
+            <p>Live sync from your Android device</p>
+        </header>
+
+        <main>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Words Tracked</h3>
+                    <p id="totalWords" class="stat-value">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Events Sync</h3>
+                    <p id="totalEvents" class="stat-value">0</p>
+                </div>
+            </div>
+
+            <section class="apps-section">
+                <h2>Top Apps (All Time)</h2>
+                <div class="app-list" id="appList">
+                    <p class="loading">Loading data...</p>
+                </div>
+            </section>
+
+            <section class="recent-section">
+                <h2>Recent Typing Log</h2>
+                <div class="recent-list" id="recentList">
+                    <p class="loading">Loading data...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
