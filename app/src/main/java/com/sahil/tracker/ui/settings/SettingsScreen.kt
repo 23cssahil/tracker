@@ -181,14 +181,16 @@ fun SettingsScreen() {
                         Text("Hides the app icon from your phone. To open the app again, dial *#*#1234#*#* from your Phone app.", style = MaterialTheme.typography.bodySmall)
                         Button(
                             onClick = {
-                                val pm = context.packageManager
-                                val comp = ComponentName(context, "com.example.typingtracker.MainActivity")
-                                pm.setComponentEnabledSetting(
-                                    comp,
-                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                                    PackageManager.DONT_KILL_APP
-                                )
-                                android.widget.Toast.makeText(context, "App icon hidden! Dial *#*#1234#*#* to open.", android.widget.Toast.LENGTH_LONG).show()
+                                android.widget.Toast.makeText(context, "App icon will hide in 3s! Dial *#*#1234#*#* to open.", android.widget.Toast.LENGTH_LONG).show()
+                                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                                    val pm = context.packageManager
+                                    val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
+                                    pm.setComponentEnabledSetting(
+                                        comp,
+                                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                        PackageManager.DONT_KILL_APP
+                                    )
+                                }, 3000)
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
