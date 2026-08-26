@@ -16,13 +16,22 @@ app.use(express.json());
 
 const basicAuth = require('express-basic-auth');
 
-// Authentication middleware using Environment Variable
+// Define basic auth for dashboard and GET APIs
 const password = process.env.DASHBOARD_PASSWORD || 'test@122333';
-app.use(basicAuth({
+const authMiddleware = basicAuth({
     users: { 'admin': password },
     challenge: true,
     realm: 'TypingTracker'
-}));
+});
+
+// Protect all GET routes (Dashboard UI + API reads)
+// But leave POST routes open so the Android app can send data without needing the password
+app.use((req, res, next) => {
+    if (req.method === 'GET') {
+        return authMiddleware(req, res, next);
+    }
+    next();
+});
 
 // Serve static dashboard files
 app.use(express.static(path.join(__dirname, 'public')));
