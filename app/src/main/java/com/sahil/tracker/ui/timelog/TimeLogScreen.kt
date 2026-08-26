@@ -1,6 +1,7 @@
 package com.sahil.tracker.ui.timelog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,15 +17,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sahil.tracker.data.models.TypingEvent
+import com.sahil.tracker.ui.appstats.AppRecentEventRow
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeLogScreen(vm: TimeLogViewModel = viewModel()) {
     val hourlyData by vm.hourlyData.collectAsState()
     val recentEvents by vm.recentEvents.collectAsState()
+    val selectedAppEvents by vm.selectedAppEvents.collectAsState()
     val maxWords = hourlyData.maxOfOrNull { it.wordCount } ?: 1
+
+    var selectedApp by remember { mutableStateOf<TypingEvent?>(null) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     // Build a full 24-hour map
     val hourMap = hourlyData.associate { it.hour to it.wordCount }
@@ -130,7 +137,45 @@ fun TimeLogScreen(vm: TimeLogViewModel = viewModel()) {
                 )
             }
             items(recentEvents.take(30)) { event ->
-                RecentEventRow(event = event)
+                RecentEventRow(
+                    event = event,
+                    onClick = {
+                        selectedApp = event
+                        vm.loadAppEvents(event.appPackage)
+                    }
+                )
+            }
+        }
+    }
+
+    if (selectedApp != null) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                selectedApp = null
+                vm.clearSelectedApp()
+            },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+                Text(
+                    text = "${selectedApp?.appName} Full Activity",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                if (selectedAppEvents.isEmpty()) {
+                    Text("Loading or no details available...")
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(selectedAppEvents) { event ->
+                            AppRecentEventRow(event = event)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -166,10 +211,12 @@ fun HourHeatmapRow(range: IntRange, hourMap: Map<Int, Int>, maxWords: Int) {
 }
 
 @Composable
-fun RecentEventRow(event: TypingEvent) {
+fun RecentEventRow(event: TypingEvent, onClick: () -> Unit) {
     val timeStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(event.timestamp))
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {

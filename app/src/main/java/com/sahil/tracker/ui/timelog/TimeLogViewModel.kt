@@ -24,6 +24,9 @@ class TimeLogViewModel(app: Application) : AndroidViewModel(app) {
     private val _recentEvents = MutableStateFlow<List<TypingEvent>>(emptyList())
     val recentEvents: StateFlow<List<TypingEvent>> = _recentEvents.asStateFlow()
 
+    private val _selectedAppEvents = MutableStateFlow<List<TypingEvent>>(emptyList())
+    val selectedAppEvents: StateFlow<List<TypingEvent>> = _selectedAppEvents.asStateFlow()
+
     val todayDate: String = dateFormat.format(Date())
 
     init {
@@ -39,5 +42,17 @@ class TimeLogViewModel(app: Application) : AndroidViewModel(app) {
                 _recentEvents.value = it
             }
         }
+    }
+
+    fun loadAppEvents(pkg: String) {
+        viewModelScope.launch {
+            repository.getEventsForApp(pkg).collect {
+                _selectedAppEvents.value = it
+            }
+        }
+    }
+
+    fun clearSelectedApp() {
+        _selectedAppEvents.value = emptyList()
     }
 }

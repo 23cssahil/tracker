@@ -52,7 +52,7 @@ class TypingAccessibilityService : AccessibilityService() {
 
         when (event.eventType) {
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> {
-                val newText = event.text.joinToString("").trim()
+                val newText = event.text.joinToString("")
                 val oldText = lastText[pkg] ?: ""
 
                 if (newText.length > oldText.length) {
@@ -64,8 +64,8 @@ class TypingAccessibilityService : AccessibilityService() {
                 }
                 lastText[pkg] = newText
 
-                // Flush on space/punctuation (word boundary)
-                if (newText.endsWith(" ") || newText.endsWith("\n")) {
+                // Flush on Enter
+                if (newText.endsWith("\n")) {
                     flushBuffer(pkg)
                 }
             }
