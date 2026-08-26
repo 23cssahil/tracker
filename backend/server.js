@@ -3,12 +3,26 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
 app.use(cors());
 app.use(express.json());
+
+const basicAuth = require('express-basic-auth');
+
+// Authentication middleware using Environment Variable
+const password = process.env.DASHBOARD_PASSWORD || 'test@122333';
+app.use(basicAuth({
+    users: { 'admin': password },
+    challenge: true,
+    realm: 'TypingTracker'
+}));
 
 // Serve static dashboard files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -49,6 +63,7 @@ app.post('/api/events', async (req, res) => {
       return res.status(400).json({ error: "Expected an array of events" });
     }
     await TypingEvent.insertMany(events);
+    io.emit('newData');
     res.status(200).json({ success: true, count: events.length });
   } catch (error) {
     console.error("Error saving events:", error);
@@ -85,6 +100,6 @@ app.get('/api/summary', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

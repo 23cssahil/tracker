@@ -135,5 +135,9 @@ window.showEventDetails = function(eventJsonEncoded) {
 // Initial load
 fetchData();
 
-// Refresh every 30 seconds
-setInterval(fetchData, 30000);
+// Setup Socket.io
+const socket = io();
+socket.on('newData', () => {
+    console.log("New data received, refreshing...");
+    fetchData();
+});
