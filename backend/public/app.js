@@ -136,7 +136,7 @@ window.showEventDetails = function(eventJsonEncoded) {
 fetchData();
 
 // Setup Socket.io
-const socket = io();
+const socket = io({ withCredentials: true });
 socket.on('newData', () => {
     console.log("New data received, refreshing...");
     fetchData();

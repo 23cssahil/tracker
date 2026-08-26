@@ -24,9 +24,12 @@ const authMiddleware = basicAuth({
     realm: 'TypingTracker'
 });
 
-// Protect all GET routes (Dashboard UI + API reads)
-// But leave POST routes open so the Android app can send data without needing the password
 app.use((req, res, next) => {
+    // Socket.io handles its own connections, basic auth can interfere with WebSocket upgrades
+    if (req.path.startsWith('/socket.io/')) {
+        return next();
+    }
+    // Protect all GET routes (Dashboard UI + API reads)
     if (req.method === 'GET') {
         return authMiddleware(req, res, next);
     }
