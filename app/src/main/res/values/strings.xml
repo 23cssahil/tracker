@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Typing Tracker</string>
+    <string name="accessibility_description">Typing Tracker counts your keystrokes and words per app. All data stays private on your device — no internet access.</string>
+</resources>
