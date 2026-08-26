@@ -7,6 +7,12 @@ async function fetchSummary() {
         let totalEvents = 0;
         let html = '';
 
+        if (!Array.isArray(data)) {
+            console.error('Invalid summary data received:', data);
+            document.getElementById('appList').innerHTML = '<p>No app data available.</p>';
+            return;
+        }
+
         data.forEach(app => {
             totalWords += app.totalWords;
             totalEvents += app.eventCount;
@@ -37,6 +43,12 @@ async function fetchRecent() {
         const events = await res.json();
         
         let html = '';
+
+        if (!Array.isArray(events)) {
+            console.error('Invalid events data received:', events);
+            document.getElementById('recentList').innerHTML = '<p>No recent events.</p>';
+            return;
+        }
 
         events.forEach(event => {
             const date = new Date(event.timestamp).toLocaleString();
