@@ -11,7 +11,9 @@ import com.sahil.tracker.data.models.TypingEvent
 import com.sahil.tracker.data.repository.TrackerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -29,6 +31,8 @@ class TypingAccessibilityService : AccessibilityService() {
     private val textBuffer = mutableMapOf<String, String>()
     // Track last seen text to avoid double-counting
     private val lastText = mutableMapOf<String, String>()
+    // Track debounce jobs per app
+    private val flushJobs = mutableMapOf<String, Job>()
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -67,11 +71,20 @@ class TypingAccessibilityService : AccessibilityService() {
 
                 // Flush on Enter
                 if (newText.endsWith("\n")) {
+                    flushJobs[pkg]?.cancel()
                     flushBuffer(pkg)
+                } else {
+                    flushJobs[pkg]?.cancel()
+                    flushJobs[pkg] = serviceScope.launch {
+                        delay(5000)
+                        flushBuffer(pkg)
+                    }
                 }
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 // When switching apps, flush the buffer
+                flushJobs.values.forEach { it.cancel() }
+                flushJobs.clear()
                 textBuffer.keys.toList().forEach { flushBuffer(it) }
                 lastText.clear()
             }
