@@ -19,12 +19,16 @@
     font-family: 'Roboto', sans-serif;
 }
 
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
 body {
     background-color: #000000; /* Darker backdrop outside mobile container */
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     overflow: hidden; /* Prevent scrolling outside container */
 }
 
@@ -32,7 +36,8 @@ body {
 .mobile-container {
     width: 100%;
     max-width: 450px;
-    height: 100vh;
+    height: 100dvh; /* dynamic vh for mobile browsers */
+    max-height: 100%;
     background-color: var(--md-sys-color-background);
     color: var(--md-sys-color-on-background);
     display: flex;
