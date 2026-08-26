@@ -196,7 +196,7 @@ fun SettingsScreen() {
                                     pm.setComponentEnabledSetting(
                                         comp,
                                         PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                                        PackageManager.DONT_KILL_APP
+                                        0 // Pass 0 to allow the system to kill the app and forcefully refresh the launcher
                                     )
                                 }, 1000)
                             },
