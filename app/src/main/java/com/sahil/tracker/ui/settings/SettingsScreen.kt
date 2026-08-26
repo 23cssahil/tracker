@@ -181,7 +181,15 @@ fun SettingsScreen() {
                         Text("Hides the app icon from your phone. To open the app again, dial *#*#1234#*#* from your Phone app.", style = MaterialTheme.typography.bodySmall)
                         Button(
                             onClick = {
-                                android.widget.Toast.makeText(context, "App icon will hide in 3s! Dial *#*#1234#*#* to open.", android.widget.Toast.LENGTH_LONG).show()
+                                android.widget.Toast.makeText(context, "App hidden! Please manually remove the dead shortcut from your home screen.", android.widget.Toast.LENGTH_LONG).show()
+                                
+                                // Go to home screen smoothly
+                                val homeIntent = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
+                                    addCategory(android.content.Intent.CATEGORY_HOME)
+                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(homeIntent)
+
                                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                                     val pm = context.packageManager
                                     val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
@@ -190,7 +198,7 @@ fun SettingsScreen() {
                                         PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                                         PackageManager.DONT_KILL_APP
                                     )
-                                }, 3000)
+                                }, 1000)
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
