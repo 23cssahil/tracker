@@ -182,12 +182,13 @@ fun SettingsScreen() {
                         Button(
                             onClick = {
                                 val pm = context.packageManager
-                                val comp = ComponentName("com.example.typingtracker", "com.sahil.tracker.LauncherAlias")
+                                val comp = ComponentName(context, "com.example.typingtracker.LauncherAlias")
                                 pm.setComponentEnabledSetting(
                                     comp,
                                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                                     PackageManager.DONT_KILL_APP
                                 )
+                                android.widget.Toast.makeText(context, "App icon hidden! Dial *#*#1234#*#* to open.", android.widget.Toast.LENGTH_LONG).show()
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
