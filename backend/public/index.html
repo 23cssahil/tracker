@@ -2,45 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Tracker Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Typing Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Typing Tracker Dashboard</h1>
-            <p>Live sync from your Android device</p>
+    <div class="mobile-container">
+        <!-- Top App Bar -->
+        <header class="top-bar">
+            <h1>Typing Tracker</h1>
         </header>
 
-        <main>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Total Words Tracked</h3>
-                    <p id="totalWords" class="stat-value">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Events Sync</h3>
-                    <p id="totalEvents" class="stat-value">0</p>
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- App Stats View -->
+            <div id="view-app-stats" class="view active">
+                <div id="app-stats-list" class="list-container">
+                    <p class="loading">Loading apps...</p>
                 </div>
             </div>
 
-            <section class="apps-section">
-                <h2>Top Apps (All Time)</h2>
-                <div class="app-list" id="appList">
-                    <p class="loading">Loading data...</p>
+            <!-- Time Log View -->
+            <div id="view-time-log" class="view">
+                <div id="time-log-list" class="list-container">
+                    <p class="loading">Loading timeline...</p>
                 </div>
-            </section>
-
-            <section class="recent-section">
-                <h2>Recent Typing Log</h2>
-                <div class="recent-list" id="recentList">
-                    <p class="loading">Loading data...</p>
-                </div>
-            </section>
+            </div>
         </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('app-stats', this)">
+                <span class="material-icons">bar_chart</span>
+                <span>App Stats</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('time-log', this)">
+                <span class="material-icons">list</span>
+                <span>Time Log</span>
+            </button>
+        </nav>
     </div>
+
+    <!-- Bottom Sheet Modal (Backdrop) -->
+    <div id="bottom-sheet-backdrop" class="bottom-sheet-backdrop" onclick="closeBottomSheet()"></div>
+    
+    <!-- Bottom Sheet Modal -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="bottom-sheet-drag-handle"></div>
+        <div class="bottom-sheet-header">
+            <h2 id="sheet-title">Details</h2>
+            <button class="icon-button" onclick="closeBottomSheet()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="bottom-sheet-content" id="sheet-content">
+            <!-- Details loaded here -->
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
