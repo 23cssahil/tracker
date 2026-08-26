@@ -212,7 +212,6 @@ fun AppStatRow(app: TypingEvent, totalWords: Int, color: Color, rank: Int, onCli
             }
         }
     }
-    }
 }
 
 @Composable
