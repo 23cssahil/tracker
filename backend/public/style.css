@@ -132,5 +132,7 @@ h2 {
     border-radius: 0.5rem;
     font-size: 0.95rem;
     white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: break-word;
     color: var(--text);
 }
